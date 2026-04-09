@@ -11,6 +11,13 @@ class WorkoutCreate(BaseModel):
     year: int
 
 
+class WorkoutSubmit(BaseModel):
+    s3_key: str
+    caption: str | None = None
+    week_number: int
+    year: int
+
+
 class WorkoutResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
