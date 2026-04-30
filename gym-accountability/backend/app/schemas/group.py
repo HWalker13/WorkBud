@@ -8,6 +8,10 @@ class GroupCreate(BaseModel):
     name: str
 
 
+class JoinGroup(BaseModel):
+    invite_code: str
+
+
 class GroupResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -16,6 +20,7 @@ class GroupResponse(BaseModel):
     invite_code: str
     created_by: UUID | None
     created_at: datetime
+    member_count: int
 
 
 class GroupMemberResponse(BaseModel):

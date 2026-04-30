@@ -1,4 +1,5 @@
 import uuid
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -6,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.models.reaction import Reaction
 from app.models.user import User
 from app.models.workout import Workout
 from app.schemas.workout import WorkoutResponse, WorkoutSubmit
@@ -57,3 +59,18 @@ def submit_workout(
     db.commit()
     db.refresh(workout)
     return workout
+
+
+@router.get("/{workout_id}/reactions")
+def get_reaction_counts(
+    workout_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    workout = db.query(Workout).filter(Workout.id == workout_id).first()
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
+
+    upvotes = db.query(Reaction).filter(Reaction.workout_id == workout_id, Reaction.type == "upvote").count()
+    tomatoes = db.query(Reaction).filter(Reaction.workout_id == workout_id, Reaction.type == "tomato").count()
+    return {"upvotes": upvotes, "tomatoes": tomatoes}
